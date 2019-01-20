@@ -21,7 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private ListView contactNames;
     private static final int REQUEST_CODE_READ_CONTACTS = 1;
-    private static boolean READ_CONTACTS_GRANTED = false;
     FloatingActionButton fab = null; // No scope so we can access from inner classes
 
     @Override
@@ -51,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
         if(hasReadContactPermission == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "onCreate: permission granted");
-            READ_CONTACTS_GRANTED = true;
         } else {
             Log.d(TAG, "onCreate: requesting permission");
 
@@ -65,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Log.d(TAG, "fab onClick: starts");
 
-                if(READ_CONTACTS_GRANTED) {
+//                if(READ_CONTACTS_GRANTED) {
+                if(ContextCompat.checkSelfPermission(MainActivity.this, READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
                     String[] projection = {ContactsContract.Contacts.DISPLAY_NAME_PRIMARY};
 
                 /*
@@ -141,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission was granted by the user
                     Log.d(TAG, "onRequestPermissionsResult: permission granted");
-                    READ_CONTACTS_GRANTED = true;
                 } else {
                     // Permission was denied by the user, disable relevant functionality
                     Log.d(TAG, "onRequestPermissionsResult: permission denied");
