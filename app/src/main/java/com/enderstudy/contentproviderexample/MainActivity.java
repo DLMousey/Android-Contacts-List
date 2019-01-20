@@ -1,10 +1,13 @@
 package com.enderstudy.contentproviderexample;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -18,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,7 +105,27 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "fab onClick: ends");
                     }
                 } else {
-                    Snackbar.make(view, "Please grant permission to access contacts", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                    Snackbar.make(view, "This app can't display your contact records unless you grant access", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Grant Access", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Log.d(TAG, "Snackbar onClick: starts");
+                                if(ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, READ_CONTACTS)) {
+                                    Log.d(TAG, "Snackbar onClick: calling requestPermissions");
+                                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{READ_CONTACTS}, REQUEST_CODE_READ_CONTACTS);
+                                } else {
+                                    // User has checked the "Don't ask again" box but keeps hitting the button
+                                    Log.d(TAG, "Snackbar onClick: taking user to settings");
+                                    Intent intent = new Intent();
+                                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    Uri uri = Uri.fromParts("package", MainActivity.this.getPackageName(), null);
+                                    intent.setData(uri);
+                                    MainActivity.this.startActivity(intent);
+                                }
+                                Log.d(TAG, "Snackbar onClick: ends");
+                            }
+                        }
+                    ).show();
                 }
             }
         });
